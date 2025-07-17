@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guia de Avaliação da API do Departamento de Polícia</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 20px;
+            color: #333;
+            background-color: #f9f9f9;
+        }
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1, h2, h3, h4 {
+            color: #2c3e50;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 5px;
+            margin-top: 30px;
+        }
+        h1 {
+            border-bottom: 3px solid #3498db;
+        }
+        pre {
+            background: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            white-space: pre-wrap; /* Quebra de linha para código */
+            word-wrap: break-word; /* Quebra de linha para código */
+        }
+        code {
+            font-family: "Courier New", Courier, monospace;
+            background: #ecf0f1;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        ul {
+            list-style-type: disc;
+            margin-left: 20px;
+        }
+        strong {
+            color: #e74c3c; /* Destaca palavras importantes */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Guia de Avaliação da API do Departamento de Polícia para Monitores</h1>
+        <p>Este documento detalha o processo de avaliação automatizada da API REST desenvolvida pelos participantes, cobrindo os testes base, bônus e de penalidade. Ele visa fornecer uma compreensão clara de como a autocorreção funciona, quais aspectos do código serão verificados e onde os alunos podem encontrar dificuldades.</p>
+
+        <hr>
+
+        <h2>1. Visão Geral do Desafio</h2>
+        <p>O objetivo deste desafio é construir uma API RESTful para gerenciar agentes e casos policiais fictícios. A API deve ser desenvolvida em Node.js com Express, utilizando arrays em memória para simular o armazenamento de dados. O projeto exige a implementação de controladores, rotas e repositórios, seguindo uma estrutura de diretórios específica. Além disso, são requisitadas validações de dados, tratamento de erros e documentação com Swagger/OAS.</p>
+
+        <hr>
+
+        <h2>2. Estrutura do Projeto Esperada</h2>
+        <p>A estrutura de diretórios é crucial para a autocorreção. Os participantes devem seguir rigorosamente o seguinte modelo:</p>
+        <pre>
+📦 SEU-REPOSITÓRIO
+│
+├── package.json
+├── server.js
+├── .env (opcional para centralizar configurações)
+│
+├── routes/
+│ ├── agentesRoutes.js
+│ └── casosRoutes.js
+│
+├── controllers/
+│ ├── agentesController.js
+│ └── casosController.js
+│
+├── repositories/
+│ ├── agentesRepository.js
+│ └── casosRepository.js
+│
+│
+├── docs/
+│ └── swagger.js (ou swagger.json/swagger.yaml)
+│
+├── utils/
+│ └── errorHandler.js (ou outras funções utilitárias)
+│
+└── .github (não deve ser deletado, contém o Autograder)
+        </pre>
+        <p><strong>Observação:</strong> A presença e o nome correto desses arquivos e diretórios são verificados pelos testes de penalidade.</p>
+
+        <hr>
+
+        <h2>3. Como os Testes Funcionam</h2>
+        <p>Os testes são escritos em JavaScript utilizando o framework Jest e o <code>axios</code> para fazer requisições HTTP à API dos alunos. Eles são divididos em três categorias principais:</p>
+        <ul>
+            <li><strong>Testes Base (Base Tests):</strong> Verificam a implementação mínima e obrigatória dos requisitos funcionais e não funcionais. O não cumprimento desses testes implica em falha na entrega básica do desafio.</li>
+            <li><strong>Testes Bônus (Bonus Tests):</strong> Avaliam a implementação de funcionalidades adicionais e melhorias, como filtros avançados, ordenação e corpos de resposta de erro personalizados. A aprovação nesses testes concede pontos extras.</li>
+            <li><strong>Testes de Penalidade (Penalty Tests):</strong> Identificam e penalizam práticas não recomendadas ou erros comuns, como validações incompletas, uso de IDs não UUID, dependências extras ou estrutura de arquivos incorreta.</li>
+        </ul>
+        <p>Cada conjunto de testes possui um <code>beforeEach</code> e um <code>afterEach</code> para configurar e limpar os dados de teste (agentes e casos) na API do aluno, garantindo que cada teste seja executado em um ambiente limpo e consistente.</p>
+
+        <hr>
+
+        <h2>4. Detalhamento dos Testes</h2>
+
+        <h3>4.1. Testes Base</h3>
+        <p>Os testes base cobrem a funcionalidade CRUD completa para os recursos de Agentes e Casos, além da validação básica de entrada e tratamento de IDs inexistentes.</p>
+
+        <h4>Recursos de Agentes (<code>/agentes</code>)</h4>
+        <table>
+            <thead>
+                <tr>
+                    <th>Método</th>
+                    <th>Endpoint</th>
+                    <th>Descrição</th>
+                    <th>Status Esperado</th>
+                    <th>Validação</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>POST</code></td>
+                    <td><code>/agentes</code></td>
+                    <td>Cria um novo agente.</td>
+                    <td><code>201 Created</code></td>
+                    <td>Retorna o objeto criado e verifica se os dados correspondem.</td>
+                </tr>
+                <tr>
+                    <td><code>GET</code></td>
+                    <td><code>/agentes</code></td>
+                    <td>Lista todos os agentes.</td>
+                    <td><code>200 OK</code></td>
+                    <td>Retorna um array de agentes e verifica se o agente criado está presente.</td>
+                </tr>
+                <tr>
+                    <td><code>GET</code></td>
+                    <td><code>/agentes/:id</code></td>
+                    <td>Retorna um agente específico por ID.</td>
+                    <td><code>200 OK</code></td>
+                    <td>Retorna o objeto do agente com o ID correspondente.</td>
+                </tr>
+                <tr>
+                    <td><code>PUT</code></td>
+                    <td><code>/agentes/:id</code></td>
+                    <td>Atualiza um agente por completo.</td>
+                    <td><code>200 OK</code></td>
+                    <td>Retorna o objeto atualizado e verifica se os dados foram alterados.</td>
+                </tr>
+                <tr>
+                    <td><code>PATCH</code></td>
+                    <td><code>/agentes/:id</code></td>
+                    <td>Atualiza um agente parcialmente.</td>
+                    <td><code>200 OK</code></td>
+                    <td>Retorna o objeto atualizado e verifica a atualização parcial.</td>
+                </tr>
+                <tr>
+                    <td><code>DELETE</code></td>
+                    <td><code>/agentes/:id</code></td>
+                    <td>Remove um agente.</td>
+                    <td><code>204 No Content</code></td>
+                    <td>Não retorna corpo de resposta e verifica se o agente foi realmente removido (GET subsequente retorna 404).</td>
+                </tr>
+            </tbody>
+        </table>
+        <p><strong>Cenários de Erro (Agentes):</strong></p>
+        <ul>
+            <li><code>POST /agentes</code> com payload inválido (campos faltando/incorretos): Esperado <strong><code>400 Bad Request</code></strong>.</li>
+            <li><code>GET /agentes/:id</code> com ID inexistente: Esperado <strong><code>404 Not Found</code></strong>.</li>
+            <li><code>PUT /agentes/:id</code> com payload inválido: Esperado <strong><code>400 Bad Request</code></strong>.</li>
+            <li><code>PUT /agentes/:id</code> com ID inexistente: Esperado <strong><code>404 Not Found</code></strong>.</li>
+            <li><code>PATCH /agentes/:id</code> com payload inválido: Esperado <strong><code>400 Bad Request</code></strong>.</li>
+            <li><code>PATCH /agentes/:id</code> com ID inexistente: Esperado <strong><code>404 Not Found</code></strong>.</li>
+            <li><code>DELETE /agentes/:id</code> com ID inexistente: Esperado <strong><code>404 Not Found</code></strong>.</li>
+        </ul>
+
+        <h4>Recursos de Casos (<code>/casos</code>)</h4>
+        <table>
+            <thead>
+                <tr>
+                    <th>Método</th>
+                    <th>Endpoint</th>
+                    <th>Descrição</th>
+                    <th>Status Esperado</th>
+                    <th>Validação</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>POST</code></td>
+                    <td><code>/casos</code></td>
+                    <td>Cria um novo caso.</td>
+                    <td><code>201 Created</code></td>
+                    <td>Retorna o objeto criado e verifica se os dados correspondem.</td>
+                </tr>
+                <tr>
+                    <td><code>GET</code></td>
+                    <td><code>/casos</code></td>
+                    <td>Lista todos os casos.</td>
+                    <td><code>200 OK</code></td>
+                    <td>Retorna um array de casos e verifica se o caso criado está presente.</td>
+                </tr>
+                <tr>
+                    <td><code>GET</code></td>
+                    <td><code>/casos/:id</code></td>
+                    <td>Retorna um caso específico por ID.</td>
+                    <td><code>200 OK</code></td>
+                    <td>Retorna o objeto do caso com o ID correspondente.</td>
+                </tr>
+                <tr>
+                    <td><code>PUT</code></td>
+                    <td><code>/casos/:id</code></td>
+                    <td>Atualiza um caso por completo.</td>
+                    <td><code>200 OK</code></td>
+                    <td>Retorna o objeto atualizado e verifica se os dados foram alterados.</td>
+                </tr>
+                <tr>
+                    <td><code>PATCH</code></td>
+                    <td><code>/casos/:id</code></td>
+                    <td>Atualiza um caso parcialmente.</td>
+                    <td><code>200 OK</code></td>
+                    <td>Retorna o objeto atualizado e verifica a atualização parcial.</td>
+                </tr>
+                <tr>
+                    <td><code>DELETE</code></td>
+                    <td><code>/casos/:id</code></td>
+                    <td>Remove um caso.</td>
+                    <td><code>204 No Content</code></td>
+                    <td>Não retorna corpo de resposta e verifica se o caso foi realmente removido.</td>
+                </tr>
+            </tbody>
+        </table>
+        <p><strong>Cenários de Erro (Casos):</strong></p>
+        <ul>
+            <li><code>POST /casos</code> com payload inválido (campos faltando/incorretos): Esperado <strong><code>400 Bad Request</code></strong>.</li>
+            <li><code>POST /casos</code> com <code>agente_id</code> inexistente: Esperado <strong><code>404 Not Found</code></strong>.</li>
+            <li><code>GET /casos/:id</code> com ID inexistente: Esperado <strong><code>404 Not Found</code></strong>.</li>
+            <li><code>PUT /casos/:id</code> com payload inválido: Esperado <strong><code>400 Bad Request</code></strong>.</li>
+            <li><code>PUT /casos/:id</code> com ID inexistente: Esperado <strong><code>404 Not Found</code></strong>.</li>
+            <li><code>PATCH /casos/:id</code> com ID inexistente: Esperado <strong><code>404 Not Found</code></strong>.</li>
+            <li><code>DELETE /casos/:id</code> com ID inexistente: Esperado <strong><code>404 Not Found</code></strong>.</li>
+        </ul>
+
+        <hr>
+
+        <h3>4.2. Testes Bônus</h3>
+        <p>Os testes bônus verificam a implementação de funcionalidades mais avançadas, focando em filtros e ordenação, além do formato personalizado para mensagens de erro.</p>
+
+        <h4>Filtros e Ordenação</h4>
+        <ul>
+            <li><strong><code>GET /casos?status=aberto</code></strong>: Filtra casos por status "aberto". Esperado <strong><code>200 OK</code></strong> e um array contendo apenas casos com <code>status: "aberto"</code>.</li>
+            <li><strong><code>GET /casos?agente_id=uuid</code></strong>: Filtra casos por ID do agente responsável. Esperado <strong><code>200 OK</code></strong> e um array contendo apenas casos atribuídos ao <code>agente_id</code> especificado.</li>
+            <li><strong><code>GET /casos/search?q=keyword</code></strong>: Realiza pesquisa "full-text" no <code>titulo</code> e/ou <code>descricao</code> dos casos. Esperado <strong><code>200 OK</code></strong> e um array contendo casos onde a <code>keyword</code> aparece em qualquer um dos campos.</li>
+            <li><strong><code>GET /agentes?cargo=inspetor</code></strong>: Filtra agentes por cargo. Esperado <strong><code>200 OK</code></strong> e um array contendo apenas agentes com o <code>cargo</code> especificado.</li>
+            <li><strong><code>GET /agentes?sort=dataDeIncorporacao</code></strong>: Ordena agentes pela <code>dataDeIncorporacao</code> em ordem crescente (do mais antigo para o mais recente). Esperado <strong><code>200 OK</code></strong> e um array ordenado.</li>
+            <li><strong><code>GET /agentes?sort=-dataDeIncorporacao</code></strong>: Ordena agentes pela <code>dataDeIncorporacao</code> em ordem decrescente (do mais recente para o mais antigo). Esperado <strong><code>200 OK</code></strong> e um array ordenado.</li>
+        </ul>
+
+        <h4>Corpo de Resposta de Erro Personalizado</h4>
+        <p>Os testes bônus verificam se o corpo da resposta de erro segue o padrão:</p>
+        <pre><code>
+{
+  "status": 400,
+  "message": "Parâmetros inválidos",
+  "errors": [
+    {
+      "campo_invalido_1": "Mensagem de erro para campo 1"
+    },
+    {
+      "campo_invalido_2": "Mensagem de erro para campo 2"
+    }
+  ]
+}
+        </code></pre>
+        <ul>
+            <li><strong>Agentes:</strong> Teste tenta criar um agente com <code>dataDeIncorporacao</code> em formato inválido (<code>30/11/2023</code>). Espera <strong><code>400 Bad Request</code></strong> e um <code>errors</code> array contendo um objeto com <code>dataDeIncorporacao</code> como chave.</li>
+            <li><strong>Casos:</strong> Teste tenta criar um caso com <code>descricao</code> vazia, <code>status</code> inválido (<code>"pendente"</code>) e <code>agente_id</code> nulo. Espera <strong><code>400 Bad Request</code></strong> e um <code>errors</code> array contendo objetos para cada campo inválido.</li>
+        </ul>
+
+        <hr>
+
+        <h3>4.3. Testes de Penalidade</h3>
+        <p>Os testes de penalidade visam identificar desvios das boas práticas e requisitos específicos do projeto, resultando em deduções de pontos.</p>
+
+        <h4>Erros Lógicos e de Validação</h4>
+        <ul>
+            <li><strong>Validação de UUID:</strong> Verifica se os IDs gerados para agentes e casos <strong>não</strong> são UUIDs válidos. Se forem UUIDs válidos, o teste falha (ou seja, o aluno <strong>não</strong> é penalizado por usar UUIDs, mas é penalizado se não usar).</li>
+            <li><strong>Agentes:</strong>
+                <ul>
+                    <li><strong>Data de Incorporação Inválida:</strong> Tenta registrar um agente com <code>dataDeIncorporacao</code> em formato <code>DD-MM-YYYY</code> ou no futuro. Se a API permitir, o teste falha.</li>
+                    <li><strong>Campos Vazios:</strong> Tenta registrar um agente com <code>nome</code>, <code>dataDeIncorporacao</code> ou <code>cargo</code> vazio. Se a API permitir, o teste falha.</li>
+                </ul>
+            </li>
+            <li><strong>Casos:</strong>
+                <ul>
+                    <li><strong>Título/Descrição Vazios:</strong> Tenta criar um caso com <code>titulo</code> ou <code>descricao</code> vazios. Se a API permitir, o teste falha.</li>
+                    <li><strong>Agente Inexistente:</strong> Tenta criar um caso com um <code>agente_id</code> que não existe. Se a API permitir (e não retornar <code>404</code>), o teste falha.</li>
+                    <li><strong>Status Inválido:</strong> Tenta criar/atualizar um caso com um <code>status</code> diferente de "aberto" ou "solucionado". Se a API permitir, o teste falha.</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h4>Organização Estática de Arquivos</h4>
+        <p>Estes testes são executados antes mesmo de qualquer requisição ser feita, verificando a estrutura do projeto.</p>
+        <ul>
+            <li><strong>Dependências Obrigatórias:</strong> Verifica se o <code>package.json</code> <strong>não</strong> contém dependências além do <code>express</code>, <code>swagger-jsdoc</code> e <code>swagger-ui-express</code>. Se contiver mais de 3 dependências, o teste falha.</li>
+            <li><strong><code>.gitignore</code> para <code>node_modules</code>:</strong> Verifica se o arquivo <code>.gitignore</code> <strong>não</strong> ignora a pasta <code>node_modules</code>. Se ignorar (que é a prática recomendada), o teste falha (ou seja, o aluno é penalizado por ter um <code>.gitignore</code> correto, o que indica que ele não seguiu a instrução de não adicionar o <code>.gitignore</code>). <em>Monitores: Essa é uma pegadinha para garantir que o aluno está atento às instruções específicas do desafio.</em></li>
+            <li><strong>Arquivo de Documentação Swagger:</strong> Verifica se o arquivo <code>swagger.json</code> ou <code>swagger.yaml</code> <strong>não</strong> existe na pasta <code>docs</code>. Se existir, o teste falha (pois a instrução era para usar <code>swagger.js</code>). <em>Monitores: Outra pegadinha, o arquivo deve ser <code>swagger.js</code> e não um JSON/YAML estático.</em></li>
+            <li><strong>Estrutura de Arquivos Rígida:</strong> Este teste é uma verificação combinada. Ele falha se <strong>todos</strong> os seguintes arquivos/pastas existirem: <code>swagger.json</code> OU <code>swagger.yaml</code>, <code>.gitignore</code>, <code>package.json</code>, <code>server.js</code>, <code>routes/agentesRoutes.js</code>, <code>routes/casosRoutes.js</code>, <code>controllers/agentesController.js</code>, <code>controllers/casosController.js</code>, <code>repositories/agentesRepository.js</code>, <code>repositories/casosRepository.js</code>. Este teste tem o objetivo de penalizar se o aluno seguiu a estrutura de arquivos à risca, incluindo os arquivos de documentação e o <code>.gitignore</code> que são penalizados individualmente. <em>Monitores: Este teste é o mais abrangente para a estrutura. A intenção é que, se o aluno seguir <strong>todas</strong> as instruções (incluindo as pegadinhas), ele falhe neste teste de penalidade, indicando um comportamento não desejado.</em></li>
+        </ul>
+
+        <hr>
+
+        <h2>5. Dificuldades Comuns e Pontos de Atenção para Monitores</h2>
+        <ul>
+            <li><strong>Validações:</strong> Muitos alunos podem ter dificuldade em implementar validações robustas para todos os campos e cenários de erro. A validação de datas (formato <code>YYYY-MM-DD</code> e data futura) e do status "aberto"/"solucionado" são pontos críticos.</li>
+            <li><strong>Tratamento de Erros:</strong> O retorno de status codes HTTP corretos (<code>400</code>, <code>404</code>) é fundamental. Além disso, a implementação do corpo de resposta de erro personalizado (bônus) pode ser um desafio.</li>
+            <li><strong>Estrutura de Arquivos:</strong> Erros no nome dos arquivos, no caminho dos <code>require</code>s ou na organização das pastas (<code>routes</code>, <code>controllers</code>, <code>repositories</code>) são muito comuns e podem quebrar a aplicação ou impedir que os testes funcionem corretamente.</li>
+            <li><strong><code>express.Router()</code>:</strong> Alguns alunos podem ter dificuldade em usar o <code>express.Router()</code> corretamente nos arquivos de rota, misturando a definição de rotas no <code>server.js</code>.</li>
+            <li><strong>Lógica nos Repositórios:</strong> É comum ver lógica de validação ou de requisição HTTP dentro dos arquivos de repositório, quando eles deveriam ser responsáveis <strong>apenas</strong> pela manipulação dos dados em memória.</li>
+            <li><strong>Implementação dos Bônus:</strong> Os filtros e a ordenação exigem manipulação de query strings e lógica de filtragem/ordenação nos arrays, o que pode ser complexo para iniciantes.</li>
+            <li><strong>UUIDs vs. IDs simples:</strong> A instrução para usar UUIDs nos IDs é uma penalidade se não for seguida. Monitores devem ficar atentos se os alunos estão gerando IDs simples (como um contador incremental) em vez de UUIDs.</li>
+            <li><strong>Dependências Adicionais:</strong> Alunos podem ser tentados a usar bibliotecas de validação (e.g., <code>joi</code>) ou de manipulação de datas (e.g., <code>moment</code>) que não foram explicitamente permitidas. A penalidade por dependências extras visa coibir isso.</li>
+        </ul>
+
+        <hr>
+
+        <h2>6. Sugestões para Apoio aos Participantes</h2>
+        <ul>
+            <li><strong>Revisão da Estrutura:</strong> Antes de mais nada, peça para o aluno verificar a estrutura de pastas e nomes de arquivos. Um erro aqui pode invalidar grande parte dos testes.</li>
+            <li><strong>Testar Cada Endpoint:</strong> Encoraje os alunos a testar cada endpoint individualmente com Postman ou Insomnia assim que o implementarem. Isso ajuda a identificar problemas de forma incremental.</li>
+            <li><strong>Console.log:</strong> Sugira o uso extensivo de <code>console.log</code> nos controladores e repositórios para depurar o fluxo de dados e identificar onde as requisições estão falhando ou onde os dados estão sendo manipulados incorretamente.</li>
+            <li><strong>Mensagens de Erro do Express:</strong> Oriente sobre como o Express trata erros e como enviar respostas com status codes específicos.</li>
+            <li><strong>Desacoplamento:</strong> Reforce a importância de manter a separação de responsabilidades entre rotas, controladores e repositórios.</li>
+        </ul>
+        <p>Com este guia, esperamos que os monitores estejam bem equipados para auxiliar os participantes neste desafio, compreendendo as expectativas da avaliação e os pontos críticos de desenvolvimento.</p>
+    </div>
+</body>
+</html>
